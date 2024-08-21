@@ -202,6 +202,8 @@ pub fn decrease_liquidity_v1<'a, 'b, 'c: 'info, 'info>(
     amount_1_min: u64,
 ) -> Result<()> {
     decrease_liquidity(
+        &ctx.accounts.nft_owner.to_account_info(),
+        &ctx.accounts.nft_account,
         &ctx.accounts.pool_state,
         &mut ctx.accounts.protocol_position,
         &mut ctx.accounts.personal_position,
@@ -230,6 +232,8 @@ pub fn decrease_liquidity_v2<'a, 'b, 'c: 'info, 'info>(
     amount_1_min: u64,
 ) -> Result<()> {
     decrease_liquidity(
+        &ctx.accounts.nft_owner.to_account_info(),
+        &ctx.accounts.nft_account,
         &ctx.accounts.pool_state,
         &mut ctx.accounts.protocol_position,
         &mut ctx.accounts.personal_position,
@@ -252,6 +256,8 @@ pub fn decrease_liquidity_v2<'a, 'b, 'c: 'info, 'info>(
 }
 
 pub fn decrease_liquidity<'a, 'b, 'c: 'info, 'info>(
+    nft_owner: &'b AccountInfo,
+    nft_account: &'b Box<InterfaceAccount<'info, TokenAccount>>,
     pool_state_loader: &'b AccountLoader<'info, PoolState>,
     protocol_position: &'b mut Box<Account<'info, ProtocolPositionState>>,
     personal_position: &'b mut Box<Account<'info, PersonalPositionState>>,
@@ -275,12 +281,14 @@ pub fn decrease_liquidity<'a, 'b, 'c: 'info, 'info>(
     //     let memp_program = accounts.memo_program.as_ref().unwrap().to_account_info();
     //     invoke_memo_instruction(DECREASE_MEMO_MSG, memp_program)?;
     // }
+    require!(nft_account.amount == 1, ErrorCode::NotApproved);
+    let mut liquidity = liquidity;
     assert!(liquidity <= personal_position.liquidity);
     let liquidity_before;
     let pool_sqrt_price_x64;
     let pool_tick_current;
     let mut tickarray_bitmap_extension = None;
-
+    let mut locked_position_info = None;
     let remaining_collect_accounts = &mut Vec::new();
     {
         let pool_state = pool_state_loader.load()?;
@@ -306,6 +314,12 @@ pub fn decrease_liquidity<'a, 'b, 'c: 'info, 'info>(
             {
                 tickarray_bitmap_extension = Some(account_info);
                 continue;
+            } else if account_info
+                .key()
+                .eq(&LockedPositionState::key(personal_position.key()))
+            {
+                locked_position_info = Some(account_info);
+                continue;
             }
             remaining_collect_accounts.push(account_info);
         }
@@ -315,6 +329,17 @@ pub fn decrease_liquidity<'a, 'b, 'c: 'info, 'info>(
                 ErrorCode::MissingTickArrayBitmapExtensionAccount
             );
         }
+    }
+
+    if nft_account.owner != nft_owner.key() {
+        require!(
+            locked_position_info.is_some() && personal_position.is_locked,
+            ErrorCode::NotApproved
+        );
+        let locked_position_state =
+            Account::<LockedPositionState>::try_from(locked_position_info.unwrap())?;
+        locked_position_state.check(nft_owner.key(), personal_position.key(), nft_account.key())?;
+        liquidity = 0;
     }
 
     let (decrease_amount_0, latest_fees_owed_0, decrease_amount_1, latest_fees_owed_1) =

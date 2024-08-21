@@ -38,10 +38,17 @@ pub struct PersonalPositionState {
 
     // Position reward info
     pub reward_infos: [PositionRewardInfo; REWARD_NUM],
+
     // account update recent epoch
     pub recent_epoch: u64,
+
+    // Indicates whether the position is locked.
+    pub is_locked: bool,
+
     // Unused bytes for future upgrades.
-    pub padding: [u64; 7],
+    pub padding1: [u8; 7],
+    // Unused bytes for future upgrades.
+    pub padding: [u64; 6],
 }
 
 impl PersonalPositionState {
