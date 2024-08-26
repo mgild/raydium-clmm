@@ -121,7 +121,7 @@ pub struct SwapState {
 }
 
 #[derive(Default)]
-struct StepComputations {
+pub struct StepComputations {
     // the price at the beginning of the step
     sqrt_price_start_x64: u128,
     // the next tick to swap to from the current tick in the swap direction
