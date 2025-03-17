@@ -338,7 +338,7 @@ pub fn get_out_put_amount_and_remaining_accounts(
     Ok((amount_calculated, tick_array_start_index_vec))
 }
 
-fn swap_compute(
+pub fn swap_compute(
     zero_for_one: bool,
     is_base_input: bool,
     is_pool_current_tick_array: bool,
