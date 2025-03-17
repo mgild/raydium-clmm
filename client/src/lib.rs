@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+pub mod instructions;
 use anchor_client::{Client, Cluster};
 use anchor_lang::prelude::AccountMeta;
 use anyhow::{format_err, Result};
