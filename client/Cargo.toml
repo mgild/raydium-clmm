@@ -1,5 +1,5 @@
 [package]
-name = "client"
+name = "raydium-client"
 version = "0.1.0"
 rust-version = "1.56"
 edition = "2021"
