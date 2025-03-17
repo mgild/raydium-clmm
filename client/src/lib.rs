@@ -32,7 +32,6 @@ use std::rc::Rc;
 use std::str::FromStr;
 use std::{collections::VecDeque, convert::identity, mem::size_of};
 
-mod instructions;
 use bincode::serialize;
 use instructions::amm_instructions::*;
 use instructions::events_instructions_parse::*;
