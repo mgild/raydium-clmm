@@ -400,7 +400,7 @@ pub fn swap_compute(
         && state.tick < tick_math::MAX_TICK
         && state.tick > tick_math::MIN_TICK
     {
-        if loop_count > 25 {
+        if loop_count > 10 {
             return Result::Err("loop_count limit");
         }
         let mut step = StepComputations::default();
