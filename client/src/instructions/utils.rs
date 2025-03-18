@@ -386,7 +386,8 @@ pub fn swap_compute(
         liquidity: pool_state.liquidity,
     };
 
-    let mut tick_array_current = tick_arrays.pop_front().unwrap();
+    let mut tick_array_current = tick_arrays.pop_front()
+        .ok_or("tick array is empty")?;
     if tick_array_current.start_tick_index != current_vaild_tick_array_start_index {
         return Result::Err("tick array start tick index does not match");
     }
