@@ -319,7 +319,7 @@ pub fn get_out_put_amount_and_remaining_accounts(
 ) -> Result<(u64, VecDeque<i32>), &'static str> {
     let (is_pool_current_tick_array, current_vaild_tick_array_start_index) = pool_state
         .get_first_initialized_tick_array(&Some(*tickarray_bitmap_extension), zero_for_one)
-        .unwrap();
+        .ok_or(|| "Failed to find first tick array")?;
 
     let (amount_calculated, tick_array_start_index_vec) = swap_compute(
         zero_for_one,
@@ -333,7 +333,6 @@ pub fn get_out_put_amount_and_remaining_accounts(
         tickarray_bitmap_extension,
         tick_arrays,
     )?;
-    println!("tick_array_start_index:{:?}", tick_array_start_index_vec);
 
     Ok((amount_calculated, tick_array_start_index_vec))
 }
