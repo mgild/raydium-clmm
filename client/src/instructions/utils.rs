@@ -319,7 +319,7 @@ pub fn get_out_put_amount_and_remaining_accounts(
 ) -> Result<(u64, VecDeque<i32>), &'static str> {
     let (is_pool_current_tick_array, current_vaild_tick_array_start_index) = pool_state
         .get_first_initialized_tick_array(&Some(*tickarray_bitmap_extension), zero_for_one)
-        .ok_or(|| "Failed to find first tick array")?;
+        .map_err(|_| "Failed to find first tick array")?;
 
     let (amount_calculated, tick_array_start_index_vec) = swap_compute(
         zero_for_one,
