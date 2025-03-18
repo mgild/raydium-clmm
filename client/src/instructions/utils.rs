@@ -431,7 +431,8 @@ pub fn swap_compute(
                     zero_for_one,
                 )
                 .unwrap();
-            tick_array_current = tick_arrays.pop_front().unwrap();
+            tick_array_current = tick_arrays.pop_front()
+                .ok_or("tick array is empty")?;
             if current_vaild_tick_array_start_index.is_none() {
                 return Result::Err("tick array start tick index out of range limit");
             }
