@@ -443,7 +443,7 @@ pub fn swap_compute(
             tick_array_start_index_vec.push_back(tick_array_current.start_tick_index);
             let mut first_initialized_tick = tick_array_current
                 .first_initialized_tick(zero_for_one)
-                .unwrap();
+                .map_err(|_|"Failed to find first initialized tick")?;
 
             next_initialized_tick = Box::new(*first_initialized_tick.deref_mut());
         }
